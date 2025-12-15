@@ -1,22 +1,30 @@
-// Supabase Configuration
-// TODO: Replace with your actual Supabase credentials
+console.log('🔄 Loading Supabase config...');
 
 const SUPABASE_URL = 'https://ldqmwlvahjfuqbrvyakj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkcW13bHZhaGpmdXFicnZ5YWtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3NTI3MzgsImV4cCI6MjA4MTMyODczOH0.DFzQoImxjE07PZZHK5CDCPS0vZ1OQtclIhqlTZ8ptzE'
-    
+
+console.log('🔍 Supabase credentials check:', {
+    url: SUPABASE_URL,
+    keyLength: SUPABASE_ANON_KEY.length,
+    keyPrefix: SUPABASE_ANON_KEY.substring(0, 10) + '...'
+});
+
 // Check if Supabase is loaded
 if (typeof supabase === 'undefined') {
-    console.error('Supabase library not loaded! Make sure the CDN link is working.');
+    console.error('❌ Supabase library not loaded! Make sure the CDN link is working.');
+} else {
+    console.log('✅ Supabase library loaded successfully');
 }
 
 // Initialize Supabase client
 let supabaseClient;
 try {
+    console.log('🔄 Creating Supabase client...');
     const { createClient } = supabase;
     supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('Supabase client initialized successfully');
+    console.log('✅ Supabase client initialized successfully');
 } catch (error) {
-    console.error('Failed to initialize Supabase client:', error);
+    console.error('❌ Failed to initialize Supabase client:', error);
 }
 
 // Configuration object
@@ -35,6 +43,8 @@ const config = {
 // Export for use in other files
 window.supabase = supabaseClient;
 window.config = config;
+
+console.log('🔄 Supabase config file loaded, client available:', !!window.supabase);
 
 // Utility functions
 const utils = {
@@ -57,22 +67,31 @@ const utils = {
 
     // Show loading state
     showLoading: () => {
+        console.log('🔄 Utils: showLoading called');
         const loadingOverlay = document.getElementById('loadingOverlay');
         if (loadingOverlay) {
             loadingOverlay.style.display = 'flex';
+            console.log('✅ Loading overlay shown');
+        } else {
+            console.warn('⚠️ Loading overlay element not found');
         }
     },
 
     // Hide loading state
     hideLoading: () => {
+        console.log('🔄 Utils: hideLoading called');
         const loadingOverlay = document.getElementById('loadingOverlay');
         if (loadingOverlay) {
             loadingOverlay.style.display = 'none';
+            console.log('✅ Loading overlay hidden');
+        } else {
+            console.warn('⚠️ Loading overlay element not found');
         }
     },
 
     // Show error message
     showError: (message) => {
+        console.log('🚨 Utils: showError called with message:', message);
         // Create a better error notification
         const errorDiv = document.createElement('div');
         errorDiv.style.cssText = `
@@ -108,6 +127,7 @@ const utils = {
 
     // Show success message
     showSuccess: (message) => {
+        console.log('✅ Utils: showSuccess called with message:', message);
         // Create a better success notification
         const successDiv = document.createElement('div');
         successDiv.style.cssText = `
@@ -149,3 +169,5 @@ const utils = {
 };
 
 window.utils = utils;
+
+console.log('🔄 Utils object attached to window:', !!window.utils);
