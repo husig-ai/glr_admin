@@ -7,25 +7,43 @@ class AuthManager {
     }
 
     async init() {
-        // Check if user is already logged in
-        const { data: { user } } = await window.supabase.auth.getUser();
-        if (user) {
-            this.currentUser = user;
-            this.showDashboard();
-        } else {
-            this.showLogin();
-        }
+        try {
+            // Add delay for GitHub Pages
+            if (window.location.hostname.includes('github.io')) {
+                console.log('GitHub Pages detected - adding initialization delay');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
 
-        // Listen for auth changes
-        window.supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN') {
-                this.currentUser = session.user;
+            // Check if Supabase is properly loaded
+            if (!window.supabase) {
+                console.error('Supabase not loaded yet, retrying...');
+                setTimeout(() => this.init(), 1000);
+                return;
+            }
+
+            // Check if user is already logged in
+            const { data: { user } } = await window.supabase.auth.getUser();
+            if (user) {
+                this.currentUser = user;
                 this.showDashboard();
-            } else if (event === 'SIGNED_OUT') {
-                this.currentUser = null;
+            } else {
                 this.showLogin();
             }
-        });
+
+            // Listen for auth changes
+            window.supabase.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN') {
+                    this.currentUser = session.user;
+                    this.showDashboard();
+                } else if (event === 'SIGNED_OUT') {
+                    this.currentUser = null;
+                    this.showLogin();
+                }
+            });
+        } catch (error) {
+            console.error('Auth initialization error:', error);
+            this.showLogin();
+        }
     }
 
     async signIn(email, password) {
