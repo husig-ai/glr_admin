@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gurkhali Admin Dashboard</title>
+    <meta name="description" content="Gurkhali Luxury Rides - Premium transportation management dashboard">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="luxury-theme">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Login Section -->
+    <div id="loginSection" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="logo-container">
+                    <img src="https://gurkhaliluxuryrides.com/images/logo.png" alt="Gurkhali Luxury Rides" class="login-logo">
+                </div>
+                <h1>Gurkhali Admin</h1>
+                <p class="tagline">Premium Transportation Management</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="admin@gurkhaliluxuryrides.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <span class="btn-text">Access Dashboard</span>
+                    <span class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+                
+                <div id="loginError" class="error-message" style="display: none;"></div>
+            </form>
+            
+            <div class="login-footer">
+                <p>Secure admin access for Gurkhali Luxury Rides</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardSection" class="dashboard" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="header-logo">
+                    <img src="https://gurkhaliluxuryrides.com/images/logo.png" alt="Gurkhali Logo" class="dashboard-logo">
+                    <div class="header-title">
+                        <h1>Gurkhali Admin</h1>
+                        <span class="header-subtitle">Fleet Management</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="user-email" id="userEmail">ayush@husig.ai</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sign Out
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-btn active" data-section="vehicles">
+                <i class="fas fa-car"></i>
+                Vehicle Fleet
+            </button>
+            <button class="nav-btn" data-section="drivers">
+                <i class="fas fa-users"></i>
+                Drivers
+            </button>
+            <button class="nav-btn" data-section="customers">
+                <i class="fas fa-user-friends"></i>
+                Customers
+            </button>
+            <button class="nav-btn" data-section="rides">
+                <i class="fas fa-route"></i>
+                Rides
+            </button>
+            <button class="nav-btn" data-section="analytics">
+                <i class="fas fa-chart-bar"></i>
+                Analytics
+            </button>
+        </nav>
+
+        <!-- Vehicle Fleet Section -->
+        <section id="vehiclesSection" class="content-section active">
+            <div class="section-header">
+                <h2>Vehicle Fleet Management</h2>
+                <button class="add-btn" id="addVehicleBtn">
+                    <i class="fas fa-plus"></i>
+                    Add New Vehicle
+                </button>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-car"></i>
+                    <div class="stat-info">
+                        <h3 id="totalVehicles">0</h3>
+                        <p>Total Vehicles</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-info">
+                        <h3 id="availableVehicles">0</h3>
+                        <p>Available</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-road"></i>
+                    <div class="stat-info">
+                        <h3 id="inServiceVehicles">0</h3>
+                        <p>In Service</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-tools"></i>
+                    <div class="stat-info">
+                        <h3 id="maintenanceVehicles">0</h3>
+                        <p>Maintenance</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="vehicles-table">
+                    <thead>
+                        <tr>
+                            <th>VEHICLE</th>
+                            <th>TYPE</th>
+                            <th>LICENSE</th>
+                            <th>STATUS</th>
+                            <th>RATE/MILE</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehiclesTableBody">
+                        <!-- Vehicle rows will be populated here -->
+                        <tr>
+                            <td colspan="6" class="no-data">
+                                <i class="fas fa-car"></i>
+                                <h3>No vehicles found</h3>
+                                <p>Get started by adding your first vehicle to the fleet.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Other sections (placeholder for future implementation) -->
+        <section id="driversSection" class="content-section">
+            <div class="section-header">
+                <h2>Driver Management</h2>
+            </div>
+            <div style="text-align: center; padding: 80px 20px; color: #6b7280;">
+                <i class="fas fa-users" style="font-size: 64px; margin-bottom: 24px; color: #e5e7eb;"></i>
+                <h3 style="margin-bottom: 12px; color: #111827; font-weight: 600; font-size: 20px;">Driver Management</h3>
+                <p style="font-size: 16px; max-width: 400px; margin: 0 auto;">Driver management features will be implemented in the next phase.</p>
+            </div>
+        </section>
+
+        <section id="customersSection" class="content-section">
+            <div class="section-header">
+                <h2>Customer Management</h2>
+            </div>
+            <div style="text-align: center; padding: 80px 20px; color: #6b7280;">
+                <i class="fas fa-user-friends" style="font-size: 64px; margin-bottom: 24px; color: #e5e7eb;"></i>
+                <h3 style="margin-bottom: 12px; color: #111827; font-weight: 600; font-size: 20px;">Customer Management</h3>
+                <p style="font-size: 16px; max-width: 400px; margin: 0 auto;">Customer management features will be implemented in the next phase.</p>
+            </div>
+        </section>
+
+        <section id="ridesSection" class="content-section">
+            <div class="section-header">
+                <h2>Ride Management</h2>
+            </div>
+            <div style="text-align: center; padding: 80px 20px; color: #6b7280;">
+                <i class="fas fa-route" style="font-size: 64px; margin-bottom: 24px; color: #e5e7eb;"></i>
+                <h3 style="margin-bottom: 12px; color: #111827; font-weight: 600; font-size: 20px;">Ride Management</h3>
+                <p style="font-size: 16px; max-width: 400px; margin: 0 auto;">Ride management features will be implemented in the next phase.</p>
+            </div>
+        </section>
+
+        <section id="analyticsSection" class="content-section">
+            <div class="section-header">
+                <h2>Analytics & Reports</h2>
+            </div>
+            <div style="text-align: center; padding: 80px 20px; color: #6b7280;">
+                <i class="fas fa-chart-bar" style="font-size: 64px; margin-bottom: 24px; color: #e5e7eb;"></i>
+                <h3 style="margin-bottom: 12px; color: #111827; font-weight: 600; font-size: 20px;">Analytics & Reports</h3>
+                <p style="font-size: 16px; max-width: 400px; margin: 0 auto;">Analytics and reporting features will be implemented in the next phase.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Vehicle Form Modal -->
+    <div id="vehicleModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Vehicle</h3>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            
+            <form id="vehicleForm" class="vehicle-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="make">Make</label>
+                        <input type="text" id="make" name="make" required placeholder="e.g., Mercedes-Benz">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="model">Model</label>
+                        <input type="text" id="model" name="model" required placeholder="e.g., S-Class">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="year">Year</label>
+                        <input type="number" id="year" name="year" required min="2010" max="2030" placeholder="2024">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="color">Color</label>
+                        <input type="text" id="color" name="color" required placeholder="e.g., Black">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="licensePlate">License Plate</label>
+                        <input type="text" id="licensePlate" name="license_plate" required placeholder="e.g., ABC-123">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="type">Vehicle Type</label>
+                        <select id="type" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="Sedan">Luxury Sedan</option>
+                            <option value="SUV">Luxury SUV</option>
+                            <option value="Van">Premium Van</option>
+                            <option value="Limousine">Limousine</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="capacity">Passenger Capacity</label>
+                        <input type="number" id="capacity" name="capacity" required min="1" max="20" placeholder="4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="isAvailable">Status</label>
+                        <select id="isAvailable" name="is_available" required>
+                            <option value="true">Available</option>
+                            <option value="false">Out of Service</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="basePrice">Base Price ($)</label>
+                        <input type="number" id="basePrice" name="base_price" required min="0" step="0.01" placeholder="50.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pricePerKm">Price per Mile ($)</label>
+                        <input type="number" id="pricePerKm" name="price_per_km" required min="0" step="0.01" placeholder="2.50">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="imageUrl">Image URL (Optional)</label>
+                        <input type="url" id="imageUrl" name="image_url" placeholder="https://example.com/vehicle-image.jpg">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="save-btn" id="saveBtn">
+                        <i class="fas fa-save"></i>
+                        <span id="saveText">Save Vehicle</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h3>Confirm Delete</h3>
+                <button class="close-btn" id="closeDeleteModalBtn">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <p>Are you sure you want to delete this vehicle?</p>
+                <p id="deleteVehicleName" style="font-weight: bold; color: #dc2626;"></p>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" id="cancelDeleteBtn">Cancel</button>
+                <button type="button" class="delete-btn modal-delete" id="confirmDeleteBtn">
+                    <i class="fas fa-trash"></i>
+                    Delete Vehicle
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/vehicles.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
