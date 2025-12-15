@@ -8,9 +8,12 @@ class AuthManager {
 
     async init() {
         try {
-            // Add delay for GitHub Pages
-            if (window.location.hostname.includes('github.io')) {
-                console.log('GitHub Pages detected - adding initialization delay');
+            // Add delay for GitHub Pages or custom domains
+            const isGitHubPages = window.location.hostname.includes('github.io') || 
+                                 window.location.hostname.includes('husig.ai');
+            
+            if (isGitHubPages) {
+                console.log('GitHub Pages or custom domain detected - adding initialization delay');
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
 
