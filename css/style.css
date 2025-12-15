@@ -538,10 +538,10 @@ body {
 }
 
 .vehicles-table th:nth-child(1) { width: 30%; } /* Vehicle */
-.vehicles-table th:nth-child(2) { width: 15%; } /* Type */
+.vehicles-table th:nth-child(2) { width: 10%; } /* Type */
 .vehicles-table th:nth-child(3) { width: 15%; } /* License */
 .vehicles-table th:nth-child(4) { width: 15%; } /* Status */
-.vehicles-table th:nth-child(5) { width: 10%; } /* Rate */
+.vehicles-table th:nth-child(5) { width: 15%; } /* Rate */
 .vehicles-table th:nth-child(6) { width: 15%; } /* Actions */
 
 .vehicles-table td {
@@ -1547,4 +1547,74 @@ body {
     .modal-header {
         border-radius: 0;
     }
+}
+
+/* Placeholder Content Styles */
+.placeholder-content {
+    text-align: center;
+    padding: 60px 40px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.placeholder-icon {
+    font-size: 64px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.placeholder-content h2 {
+    color: var(--text-primary);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.placeholder-content p {
+    color: var(--text-muted);
+    font-size: 16px;
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.placeholder-features {
+    background: var(--background-light);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    text-align: left;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.placeholder-features h4 {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.placeholder-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.placeholder-features li {
+    color: var(--text-secondary);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+    position: relative;
+    padding-left: 24px;
+}
+
+.placeholder-features li:last-child {
+    border-bottom: none;
+}
+
+.placeholder-features li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
 }

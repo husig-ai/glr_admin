@@ -1,68 +1,44 @@
 // Authentication Management
 
-console.log('🔄 Loading auth.js...');
-
 class AuthManager {
     constructor() {
-        console.log('🔐 AuthManager constructor called');
         this.currentUser = null;
         this.init();
-        console.log('✅ AuthManager constructor completed');
     }
 
     async init() {
-        console.log('🔄 AuthManager.init() started');
-        
         try {
             // Add delay for GitHub Pages or custom domains
             const isGitHubPages = window.location.hostname.includes('github.io') || 
                                  window.location.hostname.includes('husig.ai');
             
-            console.log('🌐 Domain check complete. Is GitHub Pages/Custom Domain?', isGitHubPages);
-            console.log('🌐 Current hostname:', window.location.hostname);
-            
             if (isGitHubPages) {
-                console.log('⏰ Adding initialization delay for static hosting...');
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                console.log('⏰ Initialization delay complete');
             }
 
             // Check if Supabase is properly loaded
-            console.log('🔍 Checking if Supabase is loaded...', !!window.supabase);
             if (!window.supabase) {
-                console.error('❌ Supabase not loaded yet, retrying...');
+                console.error('Supabase not loaded yet, retrying...');
                 setTimeout(() => this.init(), 1000);
                 return;
             }
 
-            console.log('✅ Supabase client found, proceeding with auth check');
-
             // Check if user is already logged in
-            console.log('👤 Calling supabase.auth.getUser()...');
-            
             const { data: { user }, error } = await window.supabase.auth.getUser();
             
-            console.log('👤 getUser() completed');
-            console.log('👤 User found:', !!user);
-            console.log('👤 Auth error:', error);
-            
             if (error) {
-                console.error('🚨 Auth error details:', error);
+                console.error('Auth error:', error);
             }
             
             if (user) {
-                console.log('✅ User authenticated, showing dashboard');
                 this.currentUser = user;
                 this.showDashboard();
             } else {
-                console.log('🔓 No user found, showing login');
                 this.showLogin();
             }
 
             // Listen for auth changes
-            console.log('🔄 Setting up auth state change listener');
             window.supabase.auth.onAuthStateChange((event, session) => {
-                console.log('🔄 Auth state changed:', event, !!session);
                 if (event === 'SIGNED_IN') {
                     this.currentUser = session.user;
                     this.showDashboard();
@@ -73,15 +49,12 @@ class AuthManager {
             });
             
         } catch (error) {
-            console.error('🚨 Auth initialization error:', error);
-            console.error('🚨 Error stack:', error.stack);
+            console.error('Auth initialization error:', error);
             this.showLogin();
         }
     }
 
     async signIn(email, password) {
-        console.log('🔄 Sign in attempt for:', email);
-        
         try {
             utils.showLoading();
             
@@ -90,40 +63,30 @@ class AuthManager {
                 password: password
             });
 
-            console.log('🔄 Sign in response:', { user: !!data?.user, error });
-
             if (error) {
-                console.error('🚨 Sign in error:', error);
                 throw error;
             }
 
             this.currentUser = data.user;
             utils.hideLoading();
-            console.log('✅ Sign in successful');
             return { success: true };
 
         } catch (error) {
-            console.error('🚨 Sign in exception:', error);
             utils.hideLoading();
             return { success: false, error: error.message };
         }
     }
 
     async signOut() {
-        console.log('🔄 Sign out initiated');
-        
         try {
             await window.supabase.auth.signOut();
             this.currentUser = null;
-            console.log('✅ Sign out successful');
         } catch (error) {
-            console.error('🚨 Sign out error:', error);
+            console.error('Sign out error:', error);
         }
     }
 
     showLogin() {
-        console.log('🔄 Showing login form');
-        
         const loginSection = document.getElementById('loginSection');
         const dashboardSection = document.getElementById('dashboardSection');
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -132,13 +95,6 @@ class AuthManager {
             loginSection.style.display = 'flex';
             dashboardSection.style.display = 'none';
             loadingOverlay.style.display = 'none';
-            console.log('✅ Login form displayed');
-        } else {
-            console.error('❌ Login form elements not found:', {
-                loginSection: !!loginSection,
-                dashboardSection: !!dashboardSection,
-                loadingOverlay: !!loadingOverlay
-            });
         }
 
         // Setup login form if not already done
@@ -146,8 +102,6 @@ class AuthManager {
     }
 
     showDashboard() {
-        console.log('🔄 Showing dashboard');
-        
         const loginSection = document.getElementById('loginSection');
         const dashboardSection = document.getElementById('dashboardSection');
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -156,33 +110,136 @@ class AuthManager {
             loginSection.style.display = 'none';
             dashboardSection.style.display = 'block';
             loadingOverlay.style.display = 'none';
-            console.log('✅ Dashboard displayed');
-        } else {
-            console.error('❌ Dashboard elements not found:', {
-                loginSection: !!loginSection,
-                dashboardSection: !!dashboardSection,
-                loadingOverlay: !!loadingOverlay
-            });
         }
+
+        // Setup navigation
+        this.setupNavigation();
 
         // Initialize vehicle manager if not already done
         if (!window.vehicleManager) {
-            console.log('🔄 Initializing VehicleManager');
             window.vehicleManager = new window.VehicleManager();
             window.vehicleManager.init();
-            console.log('✅ VehicleManager initialized');
         }
     }
 
+    setupNavigation() {
+        // Setup tab navigation
+        const navTabs = document.querySelectorAll('.nav-btn');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetSection = tab.getAttribute('data-section');
+
+                // Update active tab
+                navTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Show target section
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+
+                // Handle different section names
+                let targetElementId;
+                if (targetSection === 'vehicles') {
+                    targetElementId = 'vehiclesSection';
+                } else if (targetSection === 'drivers') {
+                    targetElementId = 'driversSection';
+                } else if (targetSection === 'customers') {
+                    targetElementId = 'customersSection';
+                } else if (targetSection === 'rides') {
+                    targetElementId = 'ridesSection';
+                } else if (targetSection === 'analytics') {
+                    targetElementId = 'analyticsSection';
+                }
+
+                const targetElement = document.getElementById(targetElementId);
+                if (targetElement) {
+                    targetElement.classList.add('active');
+                }
+
+                // Handle placeholder sections
+                if (['drivers', 'customers', 'rides', 'analytics'].includes(targetSection)) {
+                    this.showPlaceholderMessage(targetElementId);
+                }
+            });
+        });
+
+        // Setup logout functionality
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await this.signOut();
+            });
+        }
+    }
+
+    showPlaceholderMessage(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+
+        const sectionNames = {
+            driversSection: 'Driver Management',
+            customersSection: 'Customer Management', 
+            ridesSection: 'Ride Management',
+            analyticsSection: 'Analytics & Reports'
+        };
+
+        section.innerHTML = `
+            <div class="placeholder-content">
+                <div class="placeholder-icon">
+                    <i class="fas fa-cog fa-spin"></i>
+                </div>
+                <h2>${sectionNames[sectionId]}</h2>
+                <p>This feature is coming soon. Currently focusing on vehicle fleet management.</p>
+                <div class="placeholder-features">
+                    <h4>Planned Features:</h4>
+                    <ul>
+                        ${this.getPlaceholderFeatures(sectionId)}
+                    </ul>
+                </div>
+            </div>
+        `;
+    }
+
+    getPlaceholderFeatures(sectionId) {
+        const features = {
+            driversSection: [
+                'Driver registration and verification',
+                'Performance tracking and ratings',
+                'Earnings and commission management',
+                'Real-time location monitoring'
+            ],
+            customersSection: [
+                'Customer profiles and preferences',
+                'Booking history and analytics',
+                'Loyalty program management',
+                'Support ticket system'
+            ],
+            ridesSection: [
+                'Real-time ride monitoring',
+                'Dispatch and routing optimization',
+                'Fare calculation and billing',
+                'Trip history and reporting'
+            ],
+            analyticsSection: [
+                'Revenue and profit analytics',
+                'Driver performance metrics',
+                'Customer satisfaction reports',
+                'Operational efficiency insights'
+            ]
+        };
+
+        return features[sectionId]?.map(feature => `<li>${feature}</li>`).join('') || '';
+    }
+
     setupLoginForm() {
-        console.log('🔄 Setting up login form');
-        
         const loginForm = document.getElementById('loginForm');
         
-        if (!loginForm) {
-            console.error('❌ Login form not found');
-            return;
-        }
+        if (!loginForm) return;
 
         // Remove existing event listeners to avoid duplicates
         const newForm = loginForm.cloneNode(true);
@@ -190,49 +247,35 @@ class AuthManager {
 
         newForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log('🔄 Login form submitted');
 
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
             const errorDiv = document.getElementById('loginError');
 
-            if (!emailInput || !passwordInput) {
-                console.error('❌ Login form inputs not found');
-                return;
-            }
+            if (!emailInput || !passwordInput) return;
 
             const email = emailInput.value.trim();
             const password = passwordInput.value;
 
-            console.log('🔄 Attempting login with email:', email);
-
             if (!email || !password) {
-                const errorMsg = 'Please enter both email and password.';
-                console.warn('⚠️ Login validation failed:', errorMsg);
-                if (errorDiv) errorDiv.textContent = errorMsg;
+                if (errorDiv) errorDiv.textContent = 'Please enter both email and password.';
                 return;
             }
 
             const result = await this.signIn(email, password);
 
             if (!result.success) {
-                console.error('🚨 Login failed:', result.error);
                 if (errorDiv) {
                     errorDiv.textContent = result.error || 'Login failed. Please try again.';
                 }
             }
         });
-
-        console.log('✅ Login form event listener attached');
     }
 }
 
 // Global logout function
 window.logout = async () => {
-    console.log('🔄 Global logout called');
     if (window.authManager) {
         await window.authManager.signOut();
     }
 };
-
-console.log('✅ Auth.js loaded completely');
